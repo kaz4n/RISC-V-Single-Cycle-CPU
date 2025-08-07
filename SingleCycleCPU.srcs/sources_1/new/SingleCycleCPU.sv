@@ -65,14 +65,22 @@ end
     
     // Control Unit Instantiation
     ControlUnit ControlUnit(
+        //Inputs
         .opcode(op),
         .funct3(func3),
         .funct7(7'b0),       // Not used in basic implementation
         .zero_flag(alu_zero),
+        
+        //Outputs
         .alu_control(alu_control),
         .imm_source(imm_source),
         .mem_write(mem_write),
-        .reg_write(reg_write)
+        .reg_write(reg_write),
+        
+        //Multiplexer
+        .alu_source(alu_source),
+        .write_back_source(write_back_source)
+
     );
     
     
@@ -86,9 +94,16 @@ wire [31:0] read_reg1;
 wire [31:0] read_reg2;
 
 logic [31:0] write_back_data;
-always_comb begin : wbSelect
-    write_back_data = mem_read;
-    end
+
+logic [31:0] write_back_data;
+
+always_comb begin : memory_source_select
+    case (write_back_source)
+        1'b1: write_back_data = alu_result;
+        default: write_back_data = mem_read;
+    endcase
+end
+
 
 Registers regfile(
     // basic signals
@@ -111,16 +126,23 @@ logic [24:0] raw_imm;
 assign raw_imm = instruction[31:7];
 wire [31:0] immediate;
 SignExtension sign_extender(
-.source(raw_imm),
-.imm_source(imm_source),
-.extended_imm(immediate)
+    .source(raw_imm),
+    .imm_source(imm_source),
+    .extended_imm(immediate)
 );
+
+
+
+
 
 wire [31:0] alu_result;
 logic [31:0] alu_src2;
-always_comb begin : srcBSelect
-    alu_src2 = immediate;
-    end
+always_comb begin : alu_source_select
+    case (alu_source)
+        1'b1: alu_src2 = immediate;
+        default: alu_src2 = read_reg2;
+    endcase
+end
 
 ALU alu_inst(
     .alucontrol(alu_control),
@@ -130,13 +152,15 @@ ALU alu_inst(
     .zero(alu_zero)
 );
 
-memory #(
+
+
+Memory #(
 ) data_memory (
     // Memory inputs
     .clk(clk),
     .address(alu_result),
-    .write_data(32'b0),
-    .write_enable(1'b0),
+    .write_data(read_reg2),
+    .write_enable(mem_write),
     .rst_n(1'b1),
     // Memory outputs
     .read_data(mem_read)

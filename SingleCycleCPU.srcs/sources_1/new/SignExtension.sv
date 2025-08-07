@@ -29,7 +29,10 @@ output logic [31:0] extended_imm
 logic [11:0] gathered_imm;
 always_comb begin
     case(imm_source)
+    //for I type instruction
     2'b00: gathered_imm = source[24:13];
+    // for S type instruction
+    2'b01: gathered_imm = {source[24:18],source[4:0]};
     default: gathered_imm = 12'b0;
     endcase
 end

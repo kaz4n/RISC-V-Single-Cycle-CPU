@@ -1,0 +1,20 @@
+#-----------------------------------------------------------
+# Vivado v2014.2 (64-bit)
+# SW Build 932637 on Wed Jun 11 13:33:10 MDT 2014
+# IP Build 924643 on Fri May 30 09:20:16 MDT 2014
+# Start of session at: Thu Aug 07 08:12:03 2025
+# Process ID: 23144
+# Log file: C:/Users/Kaz4n/SingleCycleCPU/vivado.log
+# Journal file: C:/Users/Kaz4n/SingleCycleCPU\vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project {C:\Users\Kaz4n\SingleCycleCPU\SingleCycleCPU.xpr}
+ERROR: [Project 1-208] No val for DA Elab Attr
+ERROR: [Project 1-208] No val for DA Elab Attr
+ERROR: [Project 1-208] No val for DA Elab Attr
+ERROR: [Project 1-208] No val for DA Elab Attr
+ERROR: [Project 1-208] No val for DA Elab Attr
+Scanning sources...
+ERROR: [Common 17-70] Application Exception: SrcMgr::createSS : type not set
+exit
+INFO: [Common 17-206] Exiting Vivado at Thu Aug 07 08:12:22 2025...
