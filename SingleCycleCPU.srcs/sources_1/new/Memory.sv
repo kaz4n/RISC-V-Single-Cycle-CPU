@@ -28,10 +28,17 @@ input logic [31:0] write_data,
 input logic write_enable,
 input logic rst_n,
 output logic [31:0] read_data
+
+
 );
 
 
 logic [31:0] mem [0:63]; 
+
+
+
+
+
 always @(posedge clk) begin
 // reset logic
 if (rst_n == 1'b0) begin

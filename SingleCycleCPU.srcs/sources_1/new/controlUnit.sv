@@ -36,26 +36,40 @@ output logic reg_write
 logic [1:0] alu_op;
 
 always_comb begin
-case(opcode)
+    case(opcode)
 
 // load instruction
-    7'b0000011: begin
-        reg_write = 1'b1;
-        imm_source = 2'b00;
-        mem_write = 1'b0;
-        alu_op = 2'b00;
-    end
-    
-    default: begin 
-        reg_write = 1'b0;
-        imm_source = 2'b00;
-        mem_write = 1'b0;
-        alu_op = 2'b00;
-    end
+        7'b0000011: begin
+            reg_write = 1'b1;
+            imm_source = 2'b00;
+            mem_write = 1'b0;
+            alu_op = 2'b00;
+        end
+        
+        default: begin 
+            reg_write = 1'b0;
+            imm_source = 2'b00;
+            mem_write = 1'b0;
+            alu_op = 2'b00;
+        end
+
+    endcase
+end
 
 
+always_comb begin
 
-endcase
+    case(alu_op)
+        // store or load instruction
+        2'b00: alu_control = 3'b000;
+        // branch if equal instruction 
+        2'b01: alu_control = 3'b001;
+        //all other instructions 
+        2'b10: begin 
+        end 
+        
+        default: alu_control = 3'b111;
+    endcase
 end
 
 endmodule
