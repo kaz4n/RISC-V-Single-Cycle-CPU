@@ -36,7 +36,7 @@ output logic zero
 always_comb begin
 case (alucontrol)
     3'b000 : result = source1 + source2;
-    3'b001 : result = source1 - source2; 
+    3'b001 : result = source1 - (~source2 + 1'b1); 
     3'b010 : result = source1&source2;
     3'b011 : result = source1|source2; 
     

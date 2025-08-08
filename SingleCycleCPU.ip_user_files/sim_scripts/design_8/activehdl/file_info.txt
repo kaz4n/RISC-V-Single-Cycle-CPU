@@ -1,0 +1,2 @@
+design_8.v,verilog,xil_defaultlib,../../../bd/design_8/sim/design_8.v,incdir="../../../../../../../Xilinx/2025.1/Vivado/data/rsb/busdef"
+glbl.v,Verilog,xil_defaultlib,glbl.v

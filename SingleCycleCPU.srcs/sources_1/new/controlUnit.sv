@@ -18,6 +18,8 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
+import core__pkg::*;
+
 
 
 module ControlUnit(
@@ -28,61 +30,127 @@ input logic zero_flag,
 
 
 output logic [2:0] alu_control,
-output logic [1:0] imm_source,
+output logic [2:0] imm_source,
 output logic mem_write,
 output logic reg_write,
 output logic alu_source,
-output logic write_back_source
+output logic [1:0] write_back_source,
+output logic pc_source,
+output logic second_add_source
 
     );
 
 logic [1:0] alu_op;
+logic branch;
+logic jump;
 
 always_comb begin
     case(opcode)
 
-// load instruction I-Type
+        // load instruction I-Type
         7'b0000011: begin
             reg_write = 1'b1;
-            imm_source = 2'b00;
+            imm_source = 3'b000;
             mem_write = 1'b0;
             alu_op = 2'b00; 
-            alu_source = 2'b1; // from immediate sign extender
-            write_back_source = 2'b1; //from memory
+            alu_source = 1'b1; // from immediate sign extender
+            write_back_source = 2'b01; //from memory
+            branch = 1'b0;
+            jump = 1'b0;
             end
+        // I-type ALU
+        7'b0010011: begin
+            reg_write = 1'b1;
+            imm_source = 3'b000;
+            mem_write = 1'b0;
+            alu_op = 2'b10; 
+            alu_source = 1'b1; //from sign extender 
+            write_back_source = 2'b00; 
+            branch = 1'b0;
+            jump = 1'b0;
+        end
         // Store Instruction S-Type
         7'b0100011: begin
             reg_write = 1'b0;
-            imm_source = 2'b01;
+            imm_source = 3'b001;
             mem_write = 1'b1;
             alu_op = 2'b00;  
-            alu_source = 2'b1; // from immediate sign extender
-            write_back_source = 2'b0; //from ALU result     
+            alu_source = 1'b1; // from immediate sign extender
+            write_back_source = 2'bxx; //from ALU result 
+            branch = 1'b0;
+            jump = 1'b0;
+    
+            end
+            7'b0010111 : begin
+            reg_write = 1'b1;
+            imm_source= 3'bxxx;
+            mem_write = 1'b0;
+            alu_op = 2'b10;
+            alu_source = 1'b0; 
+            write_back_source = 2'b00; 
+            branch = 1'b0;
+            jump = 1'b0;
             end
          // R-Type
          7'b0110011 : begin
             reg_write = 1'b1;
+            imm_source= 3'bxxx;
             mem_write = 1'b0;
             alu_op = 2'b10;
-            alu_source = 1'b0; //reg2
-            write_back_source = 1'b0; //alu_result
+            alu_source = 1'b0; 
+            write_back_source = 2'b00; 
+            branch = 1'b0;
+            jump = 1'b0;
             end
+         //auipc
+         7'b0110111, 7'bb0010111 : begin
+            reg_write = 1'b1;
+            imm_source= 3'b100;
+            mem_write = 1'b0;
+            write_back_source = 2'b11; 
+            branch = 1'b0;
+            jump = 1'b0;
+            case(opcode[5])
+                1'b0: second_add_source = 1'b0;
+                1'b1: second_add_source = 1'b1;
+            endcase
+            end
+            
          //for Branch if equal
          7'b1100011: begin
             reg_write = 1'b0;
+            imm_source = 3'b010;
             mem_write = 1'b0;
             alu_op = 2'b01;
             alu_source = 1'b0; 
-            write_back_source = 1'b0; 
-            
+            write_back_source = 2'bxx;
+            branch = 1'b1;
+            jump = 1'b0;
+
          end
+         
+         //for J-type branch uncondtionally
+         7'b1101111: begin
+            reg_write = 1'b1;
+            imm_source = 3'b011;
+            mem_write = 1'b0;
+            alu_op = 2'bxx;
+            alu_source = 1'bx; 
+            write_back_source = 2'b10;
+            branch = 1'b1;
+            jump = 1'b1;
+
+         end 
         default: begin 
             reg_write = 1'b0;
-            imm_source = 2'b00;
+            imm_source = 3'b000;
             mem_write = 1'b0;
             alu_op = 2'b00;
-            alu_source = 2'b0; 
+            alu_source = 1'b0; 
             write_back_source = 2'b0; 
+            branch = 1'b0;  
+            jump = 1'b1;
+
         end
 
     endcase
@@ -122,5 +190,7 @@ always_comb begin
         default: alu_control = 3'b111;
     endcase
 end
+
+assign pc_source = (zero_flag & branch)|jump; 
 
 endmodule

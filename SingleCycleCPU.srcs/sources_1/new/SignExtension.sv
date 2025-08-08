@@ -22,22 +22,26 @@
 
 module SignExtension(
 
-input logic [1:0] imm_source,
+input logic [2:0] imm_source,
 input logic  [24:0] source,
 output logic [31:0] extended_imm
     );
 logic [11:0] gathered_imm;
 always_comb begin
     case(imm_source)
-    //for I type instruction
-    2'b00: gathered_imm = source[24:13];
-    // for S type instruction
-    2'b01: gathered_imm = {source[24:18],source[4:0]};
-    default: gathered_imm = 12'b0;
+        // For I-Types
+        3'b000 : extended_imm = {{20{source[24]}}, source[24:13]};
+        // For S-types
+        3'b001 : extended_imm = {{20{source[24]}},source[24:18],source[4:0]};
+        // For B-types
+        3'b010 : extended_imm = {{20{source[24]}},source[0],source[23:18],source[4:1],1'b0};
+        // For J-types
+        3'b011 : extended_imm = {{12{source[24]}},source[12:5], source[13], source[23:14], 1'b0};
+        3'b100: extended_imm = {source[24:5],12'b000000000000};
+        default: extended_imm  = 12'b0;
     endcase
 end
 
-assign extended_imm = {{20{gathered_imm[11]}}, gathered_imm};
 
     
 endmodule

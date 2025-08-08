@@ -26,11 +26,22 @@ input logic rst_n
 );
 reg [31:0] pc;
 logic [31:0] pc_next;
+logic [31:0] pc_target;
+logic [31:0] pc_plus_four;
+wire pc_source;
+
+assign pc_target = pc + immediate;
+assign pc_plus_four = pc + 4;
+
 wire [31:0] mem_read;
 
 
 always_comb begin : pcSelect
-    pc_next = pc + 4;
+    case(pc_source)
+        
+        1'b1: pc_next = pc_target ;
+        1'b0: pc_next = pc_plus_four;
+    endcase
 end
 always @(posedge clk) begin
     if(rst_n == 0) begin
@@ -59,9 +70,10 @@ end
     
     // Control Signals
     logic [2:0] alu_control;
-    logic [1:0] imm_source;
+    logic [2:0] imm_source;
     logic       mem_write;
     logic       reg_write;
+    
     
     // Control Unit Instantiation
     ControlUnit ControlUnit(
@@ -76,6 +88,7 @@ end
         .imm_source(imm_source),
         .mem_write(mem_write),
         .reg_write(reg_write),
+        .pc_source(pc_source),
         
         //Multiplexer
         .alu_source(alu_source),
@@ -92,15 +105,16 @@ logic [4:0] dest_reg;
 assign dest_reg = instruction[11:7];
 wire [31:0] read_reg1;
 wire [31:0] read_reg2;
-
+wire [1:0] write_back_source;
 logic [31:0] write_back_data;
 
-logic [31:0] write_back_data;
 
 always_comb begin : memory_source_select
     case (write_back_source)
-        1'b1: write_back_data = alu_result;
-        default: write_back_data = mem_read;
+        2'b00: write_back_data = mem_read;
+        2'b01: write_back_data = alu_result;
+        2'b10: write_back_data = pc_plus_four;
+        default: write_back_data =32'b0;
     endcase
 end
 

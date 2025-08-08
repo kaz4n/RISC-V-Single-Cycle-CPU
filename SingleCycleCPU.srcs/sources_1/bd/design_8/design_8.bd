@@ -1,0 +1,15 @@
+{
+  "design": {
+    "design_info": {
+      "boundary_crc": "0x0",
+      "device": "xc7vx485tffg1157-1",
+      "gen_directory": "../../../../SingleCycleCPU.gen/sources_1/bd/design_8",
+      "name": "design_8",
+      "rev_ctrl_bd_flag": "RevCtrlBdOff",
+      "synth_flow_mode": "Hierarchical",
+      "tool_version": "2025.1",
+      "validated": "true"
+    },
+    "design_tree": {}
+  }
+}
