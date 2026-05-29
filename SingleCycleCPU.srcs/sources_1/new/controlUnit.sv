@@ -47,7 +47,7 @@ logic jump;
 always_comb begin
     case(opcode)
 
-        // load instruction I-Type
+        // load instruction I-Type LW
         7'b0000011: begin
             reg_write = 1'b1;
             imm_source = 3'b000;
@@ -58,7 +58,7 @@ always_comb begin
             branch = 1'b0;
             jump = 1'b0;
             end
-        // I-type ALU
+        // R-type ALU
         7'b0010011: begin
             reg_write = 1'b1;
             imm_source = 3'b000;
@@ -66,10 +66,10 @@ always_comb begin
             alu_op = 2'b10; 
             alu_source = 1'b1; //from sign extender 
             write_back_source = 2'b00; 
-            branch = 1'b0;
+            branch = 1'b0;  
             jump = 1'b0;
         end
-        // Store Instruction S-Type
+        // Store Instruction S-Type for SW
         7'b0100011: begin
             reg_write = 1'b0;
             imm_source = 3'b001;
@@ -97,9 +97,9 @@ always_comb begin
             imm_source= 3'bxxx;
             mem_write = 1'b0;
             alu_op = 2'b10;
-            alu_source = 1'b0; 
+            alu_source = 1'b0; //from reg2 
             write_back_source = 2'b00; 
-            branch = 1'b0;
+            branch = 1'b0; //no branching and jump
             jump = 1'b0;
             end
          //auipc

@@ -20,10 +20,11 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Memory (
+module Memory #(parameter WORDS = 64 ;) (
 
 input logic clk,
 input logic [31:0] address,
+
 input logic [31:0] write_data,
 input logic write_enable,
 input logic rst_n,
@@ -33,7 +34,7 @@ output logic [31:0] read_data
 );
 
 
-logic [31:0] mem [0:63]; 
+logic [31:0] mem [0:WORDS -1]; 
 
 
 
@@ -42,7 +43,7 @@ logic [31:0] mem [0:63];
 always @(posedge clk) begin
 // reset logic
 if (rst_n == 1'b0) begin
-for (int i = 0; i < 64; i++) begin
+for (int i = 0; i < WORDS; i++) begin
     mem[i] <= 32'b0;
     end
 end

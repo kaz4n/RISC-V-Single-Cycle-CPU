@@ -19,22 +19,27 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
+// we can write to a register whilst getting data from 2 of them at the same time
 
-module Registers(
-
+module regfile(
+//clock and reset pin 
 input logic clk,
 input logic rst_n,
 
-input logic [4:0] address1,
-input logic [4:0] address2,
+//reading stuff
+input logic [4:0] address1, //reg read 1 
+input logic [4:0] address2, //reg read 2
 output logic [31:0] read_data1,
 output logic [31:0] read_data2,
 
-input logic [4:0] address3,
-input logic [31:0] write_data,
-input logic write_enable);
+//writing stuff
+input logic [4:0] address3, //where to write to 
+input logic [31:0] write_data, 
+input logic write_enable); 
 
 
+//we have an array of registers, 
+//each register is 32 bit and there is 32 regsiters in total 
 reg [31:0] registers [0:31];
 
 
@@ -49,7 +54,7 @@ else if(write_enable == 1'b1 && address3 != 0) begin
     registers[address3] <= write_data;
     end
 end
-// Read logic, async
+// async read from the regfile as reading and writing use different addr buses 
 always_comb begin : readLogic
     read_data1 = registers[address1];
     read_data2 = registers[address2];

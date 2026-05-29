@@ -43,6 +43,7 @@ always_comb begin : pcSelect
         1'b0: pc_next = pc_plus_four;
     endcase
 end
+
 always @(posedge clk) begin
     if(rst_n == 0) begin
         pc <= 32'b0;
@@ -119,7 +120,7 @@ always_comb begin : memory_source_select
 end
 
 
-Registers regfile(
+regfile regfile(
     // basic signals
     .clk(clk),
     .rst_n(rst_n),
@@ -172,10 +173,10 @@ Memory #(
 ) data_memory (
     // Memory inputs
     .clk(clk),
-    .address(alu_result),
-    .write_data(read_reg2),
+    .address(alu_result), // the alu computes the new addr e.g. 0x4(r1) is the pointer r1 + 4
+    .write_data(read_reg2), //data always taken from second register
     .write_enable(mem_write),
-    .rst_n(1'b1),
+    .rst_n(1'b1), //reset is active low
     // Memory outputs
     .read_data(mem_read)
 );
