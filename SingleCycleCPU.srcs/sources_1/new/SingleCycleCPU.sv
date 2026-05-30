@@ -30,7 +30,6 @@ logic [31:0] pc_target;
 logic [31:0] pc_plus_four;
 wire pc_source;
 
-assign pc_target = pc + immediate;
 assign pc_plus_four = pc + 4;
 
 wire [31:0] mem_read;
@@ -76,7 +75,7 @@ instruction_mem (
     logic [2:0] imm_source;
     logic       mem_write;
     logic       reg_write;
-    
+    wire [1:0] second_add_source;
     
     // Control Unit Instantiation
     ControlUnit ControlUnit(
@@ -92,6 +91,7 @@ instruction_mem (
         .mem_write(mem_write),
         .reg_write(reg_write),
         .pc_source(pc_source),
+        .second_add_source(second_add_source)
         
         //Multiplexer
         .alu_source(alu_source),
@@ -99,7 +99,13 @@ instruction_mem (
 
     );
     
-    
+    always_comb begin : second_add_select
+        case(second_add_source) 
+            2'b0: pc_target = pc + immediate ; 
+            2'b1: pc_target = immediate; 
+    endcase
+    end 
+
 logic [4:0] source_reg1;
 assign source_reg1 = instruction[19:15];
 logic [4:0] source_reg2;
@@ -117,6 +123,7 @@ always_comb begin : memory_source_select
         2'b00: write_back_data = alu_result; 
         2'b01: write_back_data = mem_read;
         2'b10: write_back_data = pc_plus_four; 
+        2'b11: write_back_data = pc_target; 
         default: write_back_data =32'b0;
     endcase
 end

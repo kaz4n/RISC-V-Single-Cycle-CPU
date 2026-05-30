@@ -36,7 +36,7 @@ output logic reg_write,
 output logic alu_source,
 output logic [1:0] write_back_source,
 output logic pc_source,
-output logic second_add_source
+output logic [1:0]second_add_source
 
     );
 
@@ -112,11 +112,11 @@ always_comb begin
             branch = 1'b0;
             jump = 1'b0;
             case(opcode[5])
-                1'b0: second_add_source = 1'b0;
-                1'b1: second_add_source = 1'b1;
+                1'b0: second_add_source = 2'b01; //auipc
+                1'b1: second_add_source = 2'b00; //lui 
             endcase
             end
-            
+          
          // B-type
          7'b1100011: begin
             reg_write = 1'b0;
@@ -127,6 +127,8 @@ always_comb begin
             write_back_source = 2'bxx;
             branch = 1'b1;
             jump = 1'b0;
+            second_add_source = 2'b00;
+
 
          end
          

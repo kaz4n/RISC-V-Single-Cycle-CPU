@@ -40,6 +40,10 @@ case (alucontrol)
     3'b010 : result = source1&source2; //and
     3'b011 : result = source1|source2;  //or
     3'bxxx : result = source1^source2; //xor
+    //set less than, by default the numbers are unsigned therefore any negative number 
+    //will be considered as a very large number, hence we use $signed() 
+    3'b101: result = {31'b0, $signed(source1) < $signed(source2)};
+    3'b : result = {31'b0, source1 < source2 };
     
     default: result = 32'b0;
     endcase
