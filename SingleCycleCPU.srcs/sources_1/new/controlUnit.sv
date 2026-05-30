@@ -58,14 +58,14 @@ always_comb begin
             branch = 1'b0;
             jump = 1'b0;
             end
-        // R-type ALU
+        // I-type ALU with imm values  
         7'b0010011: begin
             reg_write = 1'b1;
             imm_source = 3'b000;
             mem_write = 1'b0;
             alu_op = 2'b10; 
             alu_source = 1'b1; //from sign extender 
-            write_back_source = 2'b00; 
+            write_back_source = 2'b00; //to registers 
             branch = 1'b0;  
             jump = 1'b0;
         end
@@ -76,11 +76,12 @@ always_comb begin
             mem_write = 1'b1;
             alu_op = 2'b00;  
             alu_source = 1'b1; // from immediate sign extender
-            write_back_source = 2'bxx; //from ALU result 
+            write_back_source = 2'bxx; //from ALU result to memory
             branch = 1'b0;
             jump = 1'b0;
     
             end
+            //U-type? 
             7'b0010111 : begin
             reg_write = 1'b1;
             imm_source= 3'bxxx;
@@ -102,8 +103,8 @@ always_comb begin
             branch = 1'b0; //no branching and jump
             jump = 1'b0;
             end
-         //auipc
-         7'b0110111, 7'bb0010111 : begin
+         //auipc - U-type 
+         7'b0110111, 7'b0010111 : begin
             reg_write = 1'b1;
             imm_source= 3'b100;
             mem_write = 1'b0;
@@ -116,7 +117,7 @@ always_comb begin
             endcase
             end
             
-         //for Branch if equal
+         // B-type
          7'b1100011: begin
             reg_write = 1'b0;
             imm_source = 3'b010;
@@ -137,7 +138,7 @@ always_comb begin
             alu_op = 2'bxx;
             alu_source = 1'bx; 
             write_back_source = 2'b10;
-            branch = 1'b1;
+            branch = 1'b0;
             jump = 1'b1;
 
          end 
@@ -160,7 +161,7 @@ end
 always_comb begin
 
     case(alu_op)
-        // store or load instruction
+        // store or load instruction, it will be addition 
         2'b00: alu_control = 3'b000;
         // branch if equal instruction 
         2'b01: alu_control = 3'b001;
@@ -170,18 +171,23 @@ always_comb begin
                 // ADD 
                 3'b000:
                     case({opcode[5],funct7[5]})
-                        //for subtraction
+                        //for imm addition ADDI instruction
+                        2'bx0: alu_control = 3'b000; 
+                        //for addition ADD instruction
+                        2'b01: alu_control = 3'b000; 
+                        //for subtraction SUB instruction
                         2'b11: alu_control = 3'b001;
-                        //for addition
+                        //for addition ADD instruction
                         default: alu_control = 3'b000;
                     endcase
-                    
-                    
+
                 //for Set Less Than
                 3'b010: alu_control = 3'b101;
+                //for XOR 
+                3'b100: alu_control = 3'bxxx;
                 //for Or
                 3'b110: alu_control = 3'b011;
-                //for And
+                //for And &
                 3'b111: alu_control = 3'b010; 
                 
                 default: alu_control = 3'b111;
@@ -191,6 +197,7 @@ always_comb begin
     endcase
 end
 
-assign pc_source = (zero_flag & branch)|jump; 
+assign pc_source = (zero_flag & branch)|jump; //for beq if both reg are equal it'll zero will fire
+// or when we want to jump we change the PC source 
 
 endmodule

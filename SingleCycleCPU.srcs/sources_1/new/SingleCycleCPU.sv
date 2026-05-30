@@ -38,7 +38,6 @@ wire [31:0] mem_read;
 
 always_comb begin : pcSelect
     case(pc_source)
-        
         1'b1: pc_next = pc_target ;
         1'b0: pc_next = pc_plus_four;
     endcase
@@ -54,13 +53,16 @@ end
 
   logic [31:0] instruction;
     
-    Memory  #(
-    ) instruction_mem (
+    memory  #(
+        .mem_init("./test_instructionmemory.hex")
+            ) 
+instruction_mem (
         .clk(clk),
         .address(pc),
-        .write_data(32'b0),    // Instruction memory is read-only
+        .write_data(32'b0),    // Instruction memory is read only
         .write_enable(1'b0),   // Always disabled
         .rst_n(1'b1),          // Reset disabled
+        //the instruction
         .read_data(instruction)
     );
     
@@ -112,9 +114,9 @@ logic [31:0] write_back_data;
 
 always_comb begin : memory_source_select
     case (write_back_source)
-        2'b00: write_back_data = mem_read;
-        2'b01: write_back_data = alu_result;
-        2'b10: write_back_data = pc_plus_four;
+        2'b00: write_back_data = alu_result; 
+        2'b01: write_back_data = mem_read;
+        2'b10: write_back_data = pc_plus_four; 
         default: write_back_data =32'b0;
     endcase
 end
@@ -140,7 +142,7 @@ regfile regfile(
 logic [24:0] raw_imm;
 assign raw_imm = instruction[31:7];
 wire [31:0] immediate;
-SignExtension sign_extender(
+signExtension sign_extender(
     .source(raw_imm),
     .imm_source(imm_source),
     .extended_imm(immediate)
@@ -154,6 +156,7 @@ wire [31:0] alu_result;
 logic [31:0] alu_src2;
 always_comb begin : alu_source_select
     case (alu_source)
+        1'b0: alu_src2 = read_reg2;
         1'b1: alu_src2 = immediate;
         default: alu_src2 = read_reg2;
     endcase
@@ -169,8 +172,10 @@ ALU alu_inst(
 
 
 
-Memory #(
-) data_memory (
+memory #(
+.mem_init("./test_datamemory.hex")
+)
+data_memory (
     // Memory inputs
     .clk(clk),
     .address(alu_result), // the alu computes the new addr e.g. 0x4(r1) is the pointer r1 + 4

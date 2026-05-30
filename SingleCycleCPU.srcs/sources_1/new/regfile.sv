@@ -54,7 +54,7 @@ else if(write_enable == 1'b1 && address3 != 0) begin
     registers[address3] <= write_data;
     end
 end
-// async read from the regfile as reading and writing use different addr buses 
+// asynchronously read from the regfile as reading and writing use different addr buses 
 always_comb begin : readLogic
     read_data1 = registers[address1];
     read_data2 = registers[address2];

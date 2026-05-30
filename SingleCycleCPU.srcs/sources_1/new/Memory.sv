@@ -5,7 +5,7 @@
 // 
 // Create Date: 08/05/2025 12:21:30 PM
 // Design Name: 
-// Module Name: Memory
+// Module Name: memory
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,7 +20,10 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Memory #(parameter WORDS = 64 ;) (
+module memory #(
+    parameter int WORDS = 64,
+    parameter string mem_init = ""
+) (
 
 input logic clk,
 input logic [31:0] address,
@@ -35,6 +38,12 @@ output logic [31:0] read_data
 
 
 logic [31:0] mem [0:WORDS -1]; 
+
+initial begin
+    if (mem_init != "") begin
+        $readmemh(mem_init, mem);
+    end
+end
 
 
 
