@@ -68,6 +68,8 @@ instruction_mem (
     // Instruction Decoding
     logic [6:0] op = instruction[6:0];
     logic [2:0] func3 = instruction[14:12];
+    logic [6:0] func7 = instruction[31:25];
+    
     logic       alu_zero;  // From ALU
     
     // Control Signals
@@ -82,7 +84,7 @@ instruction_mem (
         //Inputs
         .opcode(op),
         .funct3(func3),
-        .funct7(7'b0),       // Not used in basic implementation
+        .funct7(),       // Not used in basic implementation
         .zero_flag(alu_zero),
         
         //Outputs

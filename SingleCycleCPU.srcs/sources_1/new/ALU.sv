@@ -31,8 +31,8 @@ output logic [31:0] result,
 output logic zero
  );
  
- 
- 
+ logic [4:0] shamt;
+ assign shamt = source2[4:0];
 always_comb begin
 case (alucontrol)
     4'b0000 : result = source1 + source2;
@@ -42,10 +42,12 @@ case (alucontrol)
     4'b1000 : result = source1^source2; //xor
     //set less than, by default the numbers are unsigned therefore any negative number 
     //will be considered as a very large number, hence we use $signed() 
-    3'b0101: result = {31'b0, $signed(source1) < $signed(source2)};
+    4'b0101: result = {31'b0, $signed(source1) < $signed(source2)};
     //for the stliu, unsigned version 
-    3'b0111 : result = {31'b0, source1 < source2 };
-    
+    4'b0111 : result = {31'b0, source1 < source2 };
+    4'b0100: source1 <<source2; //SLLI
+    4'b0110: source1 >> shamt; //SRLI
+    4'b1001: source1 >>>  shamt; //SRAI
     default: result = 32'b0;
     endcase
 end
