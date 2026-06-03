@@ -29,7 +29,7 @@ input logic [6:0] funct7,
 input logic zero_flag,
 
 
-output logic [2:0] alu_control,
+output logic [3:0] alu_control,
 output logic [2:0] imm_source,
 output logic mem_write,
 output logic reg_write,
@@ -164,9 +164,9 @@ always_comb begin
 
     case(alu_op)
         // store or load instruction, it will be addition 
-        2'b00: alu_control = 3'b000;
+        2'b00: alu_control = 4'b0000;
         // branch if equal instruction 
-        2'b01: alu_control = 3'b001;
+        2'b01: alu_control = 4'b0001;
         //all other instructions 
         2'b10: begin 
             case(funct3) 
@@ -174,28 +174,37 @@ always_comb begin
                 3'b000:
                     case({opcode[5],funct7[5]})
                         //for imm addition ADDI instruction
-                        2'bx0: alu_control = 3'b000; 
+                        2'bx0: alu_control = 4'b0000; 
                         //for addition ADD instruction
-                        2'b01: alu_control = 3'b000; 
+                        2'b01: alu_control = 4'b0000; 
                         //for subtraction SUB instruction
-                        2'b11: alu_control = 3'b001;
+                        2'b11: alu_control = 4'b0001;
                         //for addition ADD instruction
-                        default: alu_control = 3'b000;
+                        default: alu_control = 4'b0000;
                     endcase
 
-                //for Set Less Than
-                3'b010: alu_control = 3'b101;
-                //for XOR 
-                3'b100: alu_control = 3'bxxx;
-                //for Or
-                3'b110: alu_control = 3'b011;
-                //for And &
-                3'b111: alu_control = 3'b010; 
+                3'b001: alu_control = ;
                 
-                default: alu_control = 3'b111;
+                3'b101: case(funct7) begin
+                    7'b0000000: alu_control = ; 
+                    7'b0100000: alu_control = ;
+                end
+                endcase
+                //for Set Less Than SLTI
+                3'b010: alu_control = 4'b0101;
+                //for sltui
+                3'b011: alu_control= 4'b0111; 
+                //for XOR 
+                3'b100: alu_control = 4'b1000;
+                //for Or
+                3'b110: alu_control = 4'b0011;
+                //for And &
+                3'b111: alu_control = 4'b0010; 
+                
+                default: alu_control = 4'b0111;
             endcase
         end
-        default: alu_control = 3'b111;
+        default: alu_control = 4'b0111;
     endcase
 end
 

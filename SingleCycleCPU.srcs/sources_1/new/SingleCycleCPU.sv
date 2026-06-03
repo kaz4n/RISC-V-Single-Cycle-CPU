@@ -71,7 +71,7 @@ instruction_mem (
     logic       alu_zero;  // From ALU
     
     // Control Signals
-    logic [2:0] alu_control;
+    logic [3:0] alu_control;
     logic [2:0] imm_source;
     logic       mem_write;
     logic       reg_write;
