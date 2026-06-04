@@ -183,11 +183,12 @@ always_comb begin
                         default: alu_control = 4'b0000;
                     endcase
 
-                3'b001: alu_control = ;
+                
+                3'b001: alu_control = 4'b0100; //SLLI
                 
                 3'b101: case(funct7) begin
-                    7'b0000000: alu_control = ; 
-                    7'b0100000: alu_control = ;
+                    7'b0000000: alu_control = 4'b0110; //SRLI
+                    7'b0100000: alu_control = 4'b1001 ; //SRAI
                 end
                 endcase
                 //for Set Less Than SLTI
