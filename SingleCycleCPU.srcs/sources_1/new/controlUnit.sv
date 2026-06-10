@@ -27,6 +27,7 @@ input logic [6:0]opcode,
 input logic [2:0] funct3,
 input logic [6:0] funct7,
 input logic zero_flag,
+input logic alu_last_bit,
 
 
 output logic [3:0] alu_control,
@@ -137,13 +138,26 @@ always_comb begin
             reg_write = 1'b1;
             imm_source = 3'b011;
             mem_write = 1'b0;
-            alu_op = 2'bxx;
+            alu_op = 2'bxx //
             alu_source = 1'bx; 
-            write_back_source = 2'b10;
+            write_back_source = 2'b10; //get the pc + 4 to put in rd
             branch = 1'b0;
             jump = 1'b1;
 
          end 
+         //JALR
+         7'b1100111: begin
+
+            reg_write = 1'b1;
+            imm_source = 3'b000;
+            mem_write = 1'b0; 
+            alu_op = 2'b10; //as it is a I type instruction 
+            alu_source = 1'b1; 
+            write_back_source = 2'b11;
+            branch = 1'b0;
+            jump = 1'b1;            
+
+            end
         default: begin 
             reg_write = 1'b0;
             imm_source = 3'b000;
@@ -166,7 +180,14 @@ always_comb begin
         // store or load instruction, it will be addition 
         2'b00: alu_control = 4'b0000;
         // branch if equal instruction 
-        2'b01: alu_control = 4'b0001;
+        2'b01: case(func3)
+            3'b000: alu_control = 4'b0001;//BEQ
+            3'b001: alu_control = 4'b0001; //BNE
+            3'b100: alu_control = 4'b0101; //BLT
+            3'b101: alu_control = 4'b0001; //BGE
+            3'b110: alu_control = 4'b0001; // BLTU
+            3'b111: alu_control = 4'b ; //BGEU
+        endcase;
         //all other instructions 
         2'b10: begin 
             case(funct3) 
@@ -184,19 +205,21 @@ always_comb begin
                     endcase
 
                 
-                3'b001: alu_control = 4'b0100; //SLLI
+                3'b001: alu_control = 4'b0100; //SLLI and SLL
                 
-                3'b101: case(funct7) begin
-                    7'b0000000: alu_control = 4'b0110; //SRLI
-                    7'b0100000: alu_control = 4'b1001 ; //SRAI
-                end
-                endcase
-                //for Set Less Than SLTI
+                
+                //for Set Less Than SLTI and SLT
                 3'b010: alu_control = 4'b0101;
                 //for sltui
                 3'b011: alu_control= 4'b0111; 
                 //for XOR 
                 3'b100: alu_control = 4'b1000;
+                //seting 
+                3'b101: case(funct7) begin
+                    7'b0000000: alu_control = 4'b0110; //SRLI
+                    7'b0100000: alu_control = 4'b1001 ; //SRAI
+                end
+                endcase
                 //for Or
                 3'b110: alu_control = 4'b0011;
                 //for And &

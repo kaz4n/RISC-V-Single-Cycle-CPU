@@ -28,7 +28,8 @@ input logic [3:0] alucontrol ,
 
 
 output logic [31:0] result,
-output logic zero
+output logic zero,
+output logic last_bit
  );
  
  logic [4:0] shamt;
@@ -52,6 +53,7 @@ case (alucontrol)
     endcase
 end
 
+assign last_bit = result[31];
 
 assign zero = result == 32'b0;
 

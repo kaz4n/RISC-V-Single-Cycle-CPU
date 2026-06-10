@@ -86,6 +86,7 @@ instruction_mem (
         .funct3(func3),
         .funct7(func7),       // Not used in basic implementation
         .zero_flag(alu_zero),
+        .alu_last_bit(last_bit),
         
         //Outputs
         .alu_control(alu_control),
@@ -171,12 +172,15 @@ always_comb begin : alu_source_select
     endcase
 end
 
+wire last_bit; 
+
 ALU alu_inst(
     .alucontrol(alu_control),
     .source1(read_reg1),
     .source2(alu_src2),
     .result(alu_result),
-    .zero(alu_zero)
+    .zero(alu_zero),
+    .last_bit(last_bit)
 );
 
 
